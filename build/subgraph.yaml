@@ -1,0 +1,43 @@
+specVersion: 0.0.5
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum
+    name: InitialRealEstateOffering
+    network: goerli
+    source:
+      address: "0x234237db0155160Afd58f9d7c8178B5F9e120a11"
+      abi: InitialRealEstateOffering
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - IROSet
+        - IRO
+        - UserShare
+      abis:
+        - name: InitialRealEstateOffering
+          file: InitialRealEstateOffering\abis\InitialRealEstateOffering.json
+        - name: ERC20
+          file: InitialRealEstateOffering\abis\ERC20Extended.json
+      eventHandlers:
+        - event: CashBack(indexed uint256,indexed address,indexed address,uint256)
+          handler: handleCashBack
+        - event: Commit(indexed uint256,indexed address,indexed address,uint256,uint256)
+          handler: handleCommit
+        - event: CreateIRO(indexed uint256,indexed address,indexed
+            address,uint256,uint16,uint16,uint16,uint64,uint64)
+          handler: handleCreateIRO
+        - event: FundsWithdrawn(indexed uint256,indexed address,indexed
+            bool,uint256,uint256,uint256)
+          handler: handleFundsWithdrawn
+        - event: OwnerTokensClaimed(indexed uint256,indexed address,indexed address,uint256)
+          handler: handleOwnerTokensClaimed
+        - event: RealEstateCreated(indexed uint256,indexed uint256)
+          handler: handleRealEstateCreated
+        - event: TokensClaimed(indexed uint256,indexed address,indexed address,uint256)
+          handler: handleTokensClaimed
+      blockHandlers:
+        - handler: handleBlock
+      file: InitialRealEstateOffering\InitialRealEstateOffering.wasm

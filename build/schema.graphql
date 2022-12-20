@@ -1,0 +1,43 @@
+type IROSet @entity {
+  id: Bytes!
+  entityIds: [Bytes!]
+  iroIds: [BigInt!]
+}
+
+type IRO @entity {
+  id: Bytes!
+  iroId: BigInt!
+  status: Status!
+  listingOwner: Bytes!
+  unitPrice: BigInt!
+  listingOwnerShare: BigDecimal!
+  treasuryFee: BigDecimal!
+  reservesFee: BigDecimal!
+  currency: Bytes!
+  currencyDecimals: BigInt!
+  softCap: BigInt!
+  hardCap: BigInt!
+  start: BigInt!
+  end: BigInt!
+  totalFunding: BigInt!
+  shares: [UserShare!]
+  fundsWithdrawn: Boolean!
+  ownerClaimed: Boolean!
+  realEstateId: BigInt
+}
+
+type UserShare @entity {
+  id: Bytes!
+  address: Bytes!
+  commitedFunds: BigInt!
+  amount: BigInt!
+  share: BigDecimal!
+  claimed: Boolean!
+}
+
+enum Status {
+  PENDING,
+  ONGOING,
+  SUCCESS,
+  FAIL
+}
