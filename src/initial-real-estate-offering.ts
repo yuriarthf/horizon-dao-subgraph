@@ -1,4 +1,4 @@
-import { Bytes, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Bytes, BigDecimal, BigInt, ethereum, Address } from "@graphprotocol/graph-ts";
 
 import {
   CashBack as CashBackEvent,
@@ -14,46 +14,43 @@ import {
 import { ERC20 as ERC20Contract } from "../generated/InitialRealEstateOffering/ERC20";
 import { IROSet, IRO, UserShare } from "../generated/schema";
 
-enum Status {
-  PENDING,
-  ONGOING,
-  SUCCESS,
-  FAIL,
-}
-
-const IRO_SET_ID = Bytes.fromBigInt(new BigInt(0));
+const IRO_SET_ID = Bytes.fromByteArray(Bytes.fromBigInt(new BigInt(0)));
 
 function normalizeRatio(iroContract: InitialRealEstateOfferingContract, num: number): BigDecimal {
-  return new BigDecimal(new BigInt(num)).div(new BigDecimal(new BigInt(iroContract.DENOMINATOR())));
+  return new BigDecimal(new BigInt(<i32>num)).div(new BigDecimal(new BigInt(iroContract.DENOMINATOR())));
 }
 
-function getStatus(iro: IRO, timestamp: BigInt): Status {
-  if (iro.start.gt(timestamp)) return Status.PENDING;
+function getStatus(iro: IRO, timestamp: BigInt): string {
+  if (iro.start.gt(timestamp)) return "PENDING";
   if (iro.end.gt(timestamp)) {
-    if (iro.totalFunding.equals(iro.totalFunding)) return Status.SUCCESS;
-    return Status.ONGOING;
+    if (iro.totalFunding.equals(iro.totalFunding)) return "SUCCESS";
+    return "ONGOING";
   }
   if (iro.end.le(timestamp)) {
-    if (iro.softCap.gt(iro.totalFunding)) return Status.FAIL;
-    return Status.SUCCESS;
+    if (iro.softCap.gt(iro.totalFunding)) return "FAIL";
+    return "SUCCESS";
   }
-  return Status.FAIL;
+  return "FAIL";
 }
 
 export function handleCashBack(event: CashBackEvent): void {
-  const iro = IRO.load(Bytes.fromBigInt(event.params._iroId));
+  const iro = IRO.load(Bytes.fromByteArray(Bytes.fromBigInt(event.params._iroId)));
 
-  let shareIds = iro.shares;
-  const userShares = shareIds.map((shareId) => UserShare.load(shareId));
-
-  const userShare = userShares.at(userShares.findIndex((share) => share.address === event.params._by));
+  let shareIds = iro!.shares!;
+  const userShares = shareIds.map<UserShare>((shareId) => UserShare.load(shareId)!);
+  let userShare: UserShare;
+  for (let i = 0; i < userShares.length; i++) {
+    if (Address.fromBytes(userShares[i].address).equals(event.params._by)) {
+      userShare = userShares[i];
+    }
+  }
 
   userShare.claimed = true;
   userShare.save();
 }
 
 export function handleCommit(event: CommitEvent): void {
-  const iro = IRO.load(Bytes.fromBigInt(event.params._iroId));
+  const iro = IRO.load(Bytes.fromByteArray(Bytes.fromBigInt(event.params._iroId)))!;
 
   iro.totalFunding = iro.totalFunding.plus(event.params._value);
 
@@ -84,7 +81,7 @@ export function handleCommit(event: CommitEvent): void {
       userShare.save();
       shareIds.push(userShare.id);
     } else {
-      const userShare = UserShare.load(shareIds.at(shareIds.findIndex((shareId) => shareId === userShareId)));
+      const userShare = UserShare.load(userShareId)!;
       userShare.commitedFunds = userShare.commitedFunds.plus(event.params._value);
       userShare.amount = userShare.amount.plus(event.params._purchasedAmount);
       userShare.share = userShareBPS;
@@ -95,11 +92,11 @@ export function handleCommit(event: CommitEvent): void {
 }
 
 export function handleCreateIRO(event: CreateIROEvent): void {
-  const iro = new IRO(Bytes.fromBigInt(event.params._iroId));
+  const iro = new IRO(Bytes.fromByteArray(Bytes.fromBigInt(event.params._iroId)));
   const iroContract = InitialRealEstateOfferingContract.bind(event.address);
 
   iro.iroId = event.params._iroId;
-  iro.status = Status[iroContract.getStatus(iro.iroId)];
+  iro.status = getStatus(iro, event.block.timestamp);
   iro.listingOwner = event.params._listingOwner;
   iro.unitPrice = event.params._unitPrice;
   iro.listingOwnerShare = normalizeRatio(iroContract, event.params._listingOwnerShare);
@@ -120,60 +117,68 @@ export function handleCreateIRO(event: CreateIROEvent): void {
   iro.save();
 
   // update IROSet
-  const iroSet = IROSet.load(IRO_SET_ID);
-  const entityIds = iroSet.entityIds;
-  const iroIds = iroSet.iroIds;
-  entityIds.push(iro.id);
-  iroIds.push(iro.iroId);
+  const iroSet = IROSet.load(IRO_SET_ID)!;
+  let entityIds = iroSet.entityIds;
+  let iroIds = iroSet.iroIds;
+  if (!entityIds || !iroIds) {
+    entityIds = [iro.id];
+    iroIds = [iro.iroId];
+
+  } else {
+    entityIds.push(iro.id);
+    iroIds.push(iro.iroId);
+  }
   iroSet.entityIds = entityIds;
   iroSet.iroIds = iroIds;
   iroSet.save();
 }
 
 export function handleFundsWithdrawn(event: FundsWithdrawnEvent): void {
-  const iro = IRO.load(Bytes.fromBigInt(event.params._iroId));
+  const iro = IRO.load(Bytes.fromByteArray(Bytes.fromBigInt(event.params._iroId)))!;
 
   iro.fundsWithdrawn = true;
   iro.save();
 }
 
 export function handleOwnerTokensClaimed(event: OwnerTokensClaimedEvent): void {
-  const iro = IRO.load(Bytes.fromBigInt(event.params._iroId));
+  const iro = IRO.load(Bytes.fromByteArray(Bytes.fromBigInt(event.params._iroId)))!;
 
   iro.ownerClaimed = true;
   iro.save();
 }
 
 export function handleRealEstateCreated(event: RealEstateCreatedEvent): void {
-  const iro = IRO.load(Bytes.fromBigInt(event.params._iroId));
+  const iro = IRO.load(Bytes.fromByteArray(Bytes.fromBigInt(event.params._iroId)))!;
 
   iro.iroId = event.params._realEstateId;
   iro.save();
 }
 
 export function handleTokensClaimed(event: TokensClaimedEvent): void {
-  const iro = IRO.load(Bytes.fromBigInt(event.params._iroId));
+  const iro = IRO.load(Bytes.fromByteArray(Bytes.fromBigInt(event.params._iroId)))!;
 
-  const userShare = UserShare.load(iro.id.concatI32(event.params._by.toI32()));
+  const userShare = UserShare.load(iro.id.concatI32(event.params._by.toI32()))!;
   userShare.claimed = true;
   userShare.save();
 }
 
 export function handleBlock(block: ethereum.Block): void {
-  let iroSet = IROSet.load(IRO_SET_ID);
+  let iroSet = IROSet.load(IRO_SET_ID)!;
   if (!iroSet) {
     iroSet = new IROSet(IRO_SET_ID);
     iroSet.save();
   } else {
-    iroSet.entityIds.forEach((entityId) => {
-      const iro = IRO.load(entityId);
-      if ([Status[Status.PENDING], Status[Status.ONGOING]].includes(iro.status)) {
-        const status = Status[getStatus(iro, block.timestamp)];
+    const entityIds = iroSet.entityIds;
+    if (!entityIds) return;
+    for (let i = 0; i < entityIds.length; i++) {
+      const iro = IRO.load(entityIds[i])!;
+      if (["PENDING", "ONGOING"].includes(iro.status)) {
+        const status = getStatus(iro, block.timestamp);
         if (iro.status !== status) {
           iro.status = status;
           iro.save();
         }
       }
-    });
+    }
   }
 }
