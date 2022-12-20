@@ -1,26 +1,18 @@
-import { Bytes, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Bytes, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 import {
-  AdminChanged as AdminChangedEvent,
-  BeaconUpgraded as BeaconUpgradedEvent,
   CashBack as CashBackEvent,
   Commit as CommitEvent,
   CreateIRO as CreateIROEvent,
   FundsWithdrawn as FundsWithdrawnEvent,
-  Initialized as InitializedEvent,
   OwnerTokensClaimed as OwnerTokensClaimedEvent,
-  OwnershipTransferred as OwnershipTransferredEvent,
   RealEstateCreated as RealEstateCreatedEvent,
-  SetBaseCurrency as SetBaseCurrencyEvent,
-  SetRealEstateReserves as SetRealEstateReservesEvent,
-  SetTreasury as SetTreasuryEvent,
   TokensClaimed as TokensClaimedEvent,
-  Upgraded as UpgradedEvent,
   InitialRealEstateOffering as InitialRealEstateOfferingContract,
 } from "../generated/InitialRealEstateOffering/InitialRealEstateOffering";
 
 import { ERC20 as ERC20Contract } from "../generated/InitialRealEstateOffering/ERC20";
-import { IRO, UserShare } from "../generated/schema";
+import { IROSet, IRO, UserShare } from "../generated/schema";
 
 enum Status {
   PENDING,
@@ -29,8 +21,23 @@ enum Status {
   FAIL,
 }
 
+const IRO_SET_ID = Bytes.fromBigInt(new BigInt(0));
+
 function normalizeRatio(iroContract: InitialRealEstateOfferingContract, num: number): BigDecimal {
   return new BigDecimal(new BigInt(num)).div(new BigDecimal(new BigInt(iroContract.DENOMINATOR())));
+}
+
+function getStatus(iro: IRO, timestamp: BigInt): Status {
+  if (iro.start.gt(timestamp)) return Status.PENDING;
+  if (iro.end.gt(timestamp)) {
+    if (iro.totalFunding.equals(iro.totalFunding)) return Status.SUCCESS;
+    return Status.ONGOING;
+  }
+  if (iro.end.le(timestamp)) {
+    if (iro.softCap.gt(iro.totalFunding)) return Status.FAIL;
+    return Status.SUCCESS;
+  }
+  return Status.FAIL;
 }
 
 export function handleCashBack(event: CashBackEvent): void {
@@ -53,7 +60,7 @@ export function handleCommit(event: CommitEvent): void {
   let shareIds = iro.shares;
   const userShareId = iro.id.concatI32(event.params._user.toI32());
   const iroContract = InitialRealEstateOfferingContract.bind(event.address);
-  let userShareBPS = normalizeRatio(
+  const userShareBPS = normalizeRatio(
     iroContract,
     iroContract.userAmountAndShare(event.params._iroId, event.params._user).value1,
   );
@@ -88,7 +95,7 @@ export function handleCommit(event: CommitEvent): void {
 }
 
 export function handleCreateIRO(event: CreateIROEvent): void {
-  let iro = new IRO(Bytes.fromBigInt(event.params._iroId));
+  const iro = new IRO(Bytes.fromBigInt(event.params._iroId));
   const iroContract = InitialRealEstateOfferingContract.bind(event.address);
 
   iro.iroId = event.params._iroId;
@@ -111,12 +118,62 @@ export function handleCreateIRO(event: CreateIROEvent): void {
   iro.fundsWithdrawn = false;
   iro.ownerClaimed = false;
   iro.save();
+
+  // update IROSet
+  const iroSet = IROSet.load(IRO_SET_ID);
+  const entityIds = iroSet.entityIds;
+  const iroIds = iroSet.iroIds;
+  entityIds.push(iro.id);
+  iroIds.push(iro.iroId);
+  iroSet.entityIds = entityIds;
+  iroSet.iroIds = iroIds;
+  iroSet.save();
 }
 
-export function handleFundsWithdrawn(event: FundsWithdrawnEvent): void {}
+export function handleFundsWithdrawn(event: FundsWithdrawnEvent): void {
+  const iro = IRO.load(Bytes.fromBigInt(event.params._iroId));
 
-export function handleOwnerTokensClaimed(event: OwnerTokensClaimedEvent): void {}
+  iro.fundsWithdrawn = true;
+  iro.save();
+}
 
-export function handleRealEstateCreated(event: RealEstateCreatedEvent): void {}
+export function handleOwnerTokensClaimed(event: OwnerTokensClaimedEvent): void {
+  const iro = IRO.load(Bytes.fromBigInt(event.params._iroId));
 
-export function handleTokensClaimed(event: TokensClaimedEvent): void {}
+  iro.ownerClaimed = true;
+  iro.save();
+}
+
+export function handleRealEstateCreated(event: RealEstateCreatedEvent): void {
+  const iro = IRO.load(Bytes.fromBigInt(event.params._iroId));
+
+  iro.iroId = event.params._realEstateId;
+  iro.save();
+}
+
+export function handleTokensClaimed(event: TokensClaimedEvent): void {
+  const iro = IRO.load(Bytes.fromBigInt(event.params._iroId));
+
+  const userShare = UserShare.load(iro.id.concatI32(event.params._by.toI32()));
+  userShare.claimed = true;
+  userShare.save();
+}
+
+export function handleBlock(block: ethereum.Block): void {
+  let iroSet = IROSet.load(IRO_SET_ID);
+  if (!iroSet) {
+    iroSet = new IROSet(IRO_SET_ID);
+    iroSet.save();
+  } else {
+    iroSet.entityIds.forEach((entityId) => {
+      const iro = IRO.load(entityId);
+      if ([Status[Status.PENDING], Status[Status.ONGOING]].includes(iro.status)) {
+        const status = Status[getStatus(iro, block.timestamp)];
+        if (iro.status !== status) {
+          iro.status = status;
+          iro.save();
+        }
+      }
+    });
+  }
+}

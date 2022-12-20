@@ -1,3 +1,9 @@
+type IROSet @entity {
+  id: Bytes!
+  entityIds: [Bytes!]
+  iroIds: [BigInt!]
+}
+
 type IRO @entity {
   id: Bytes!
   iroId: BigInt!

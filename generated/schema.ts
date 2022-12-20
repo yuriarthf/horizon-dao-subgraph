@@ -11,6 +11,72 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
+export class IROSet extends Entity {
+  constructor(id: Bytes) {
+    super();
+    this.set("id", Value.fromBytes(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save IROSet entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.BYTES,
+        `Entities of type IROSet must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("IROSet", id.toBytes().toHexString(), this);
+    }
+  }
+
+  static load(id: Bytes): IROSet | null {
+    return changetype<IROSet | null>(store.get("IROSet", id.toHexString()));
+  }
+
+  get id(): Bytes {
+    let value = this.get("id");
+    return value!.toBytes();
+  }
+
+  set id(value: Bytes) {
+    this.set("id", Value.fromBytes(value));
+  }
+
+  get entityIds(): Array<Bytes> | null {
+    let value = this.get("entityIds");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytesArray();
+    }
+  }
+
+  set entityIds(value: Array<Bytes> | null) {
+    if (!value) {
+      this.unset("entityIds");
+    } else {
+      this.set("entityIds", Value.fromBytesArray(<Array<Bytes>>value));
+    }
+  }
+
+  get iroIds(): Array<BigInt> | null {
+    let value = this.get("iroIds");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigIntArray();
+    }
+  }
+
+  set iroIds(value: Array<BigInt> | null) {
+    if (!value) {
+      this.unset("iroIds");
+    } else {
+      this.set("iroIds", Value.fromBigIntArray(<Array<BigInt>>value));
+    }
+  }
+}
+
 export class IRO extends Entity {
   constructor(id: Bytes) {
     super();
