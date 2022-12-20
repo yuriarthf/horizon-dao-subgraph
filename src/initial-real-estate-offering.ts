@@ -163,7 +163,7 @@ export function handleTokensClaimed(event: TokensClaimedEvent): void {
 }
 
 export function handleBlock(block: ethereum.Block): void {
-  let iroSet = IROSet.load(IRO_SET_ID)!;
+  let iroSet = IROSet.load(IRO_SET_ID);
   if (!iroSet) {
     iroSet = new IROSet(IRO_SET_ID);
     iroSet.save();

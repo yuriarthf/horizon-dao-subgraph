@@ -6,8 +6,9 @@ dataSources:
     name: InitialRealEstateOffering
     network: goerli
     source:
-      address: "0x234237db0155160Afd58f9d7c8178B5F9e120a11"
+      address: "0xe2b30b95FF4D69A0973C6640E0992e8B5C739fb9"
       abi: InitialRealEstateOffering
+      startBlock: 8170587
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
