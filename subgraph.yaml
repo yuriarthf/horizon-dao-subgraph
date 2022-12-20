@@ -21,10 +21,18 @@ dataSources:
         - name: ERC20
           file: ./abis/ERC20Extended.json
       eventHandlers:
+        - event: CashBack(indexed uint256,indexed address,indexed address,uint256)
+          handler: handleCashBack
         - event: Commit(indexed uint256,indexed address,indexed address,uint256,uint256)
           handler: handleCommit
         - event: CreateIRO(indexed uint256,indexed address,indexed address,uint256,uint16,uint16,uint16,uint64,uint64)
           handler: handleCreateIRO
+        - event: FundsWithdrawn(indexed uint256,indexed address,indexed bool,uint256,uint256,uint256)
+          handler: handleFundsWithdrawn
+        - event: OwnerTokensClaimed(indexed uint256,indexed address,indexed address,uint256)
+          handler: handleOwnerTokensClaimed
+        - event: RealEstateCreated(indexed uint256,indexed uint256)
+          handler: handleRealEstateCreated
         - event: TokensClaimed(indexed uint256,indexed address,indexed address,uint256)
           handler: handleTokensClaimed
       file: ./src/initial-real-estate-offering.ts
