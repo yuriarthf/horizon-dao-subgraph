@@ -1,0 +1,26 @@
+{
+  "name": "horizon-iro",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ horizon-iro",
+    "create-local": "graph create --node http://localhost:8020/ horizon-iro",
+    "remove-local": "graph remove --node http://localhost:8020/ horizon-iro",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 horizon-iro",
+    "test": "graph test",
+    "prettier": "prettier --config ./.prettierrc.yml --write \"**/*.{js,json,md,ts,yml}\"",
+    "prettier:check": "prettier --check --config ./.prettierrc.yml \"**/*.{js,json,md,ts,yml}\""
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.37.1",
+    "@graphprotocol/graph-ts": "0.28.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.30.0",
+    "eslint-config-prettier": "^8.5.0",
+    "matchstick-as": "0.5.0",
+    "prettier": "^2.8.1",
+    "typescript-eslint": "^0.0.1-alpha.0"
+  }
+}
