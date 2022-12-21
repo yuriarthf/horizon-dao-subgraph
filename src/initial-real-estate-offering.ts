@@ -38,15 +38,14 @@ export function handleCashBack(event: CashBackEvent): void {
 
   let shareIds = iro!.shares!;
   const userShares = shareIds.map<UserShare>((shareId) => UserShare.load(shareId)!);
-  let userShare: UserShare;
   for (let i = 0; i < userShares.length; i++) {
     if (Address.fromBytes(userShares[i].address).equals(event.params._by)) {
-      userShare = userShares[i];
+      const userShare = userShares[i];
+      userShare.claimed = true;
+      userShare.save();
+      break;
     }
   }
-
-  userShare.claimed = true;
-  userShare.save();
 }
 
 export function handleCommit(event: CommitEvent): void {
@@ -123,7 +122,6 @@ export function handleCreateIRO(event: CreateIROEvent): void {
   if (!entityIds || !iroIds) {
     entityIds = [iro.id];
     iroIds = [iro.iroId];
-
   } else {
     entityIds.push(iro.id);
     iroIds.push(iro.iroId);
