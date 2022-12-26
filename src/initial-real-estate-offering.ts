@@ -16,8 +16,8 @@ import { IROSet, IRO, UserShare } from "../generated/schema";
 
 const IRO_SET_ID = Bytes.fromByteArray(Bytes.fromBigInt(new BigInt(0)));
 
-function normalizeRatio(iroContract: InitialRealEstateOfferingContract, num: number): BigDecimal {
-  return new BigDecimal(new BigInt(<i32>num)).div(new BigDecimal(new BigInt(iroContract.DENOMINATOR())));
+function normalizeRatio(num: number, den: number): BigDecimal {
+  return BigInt.fromU64(<u64>num).divDecimal(new BigDecimal(BigInt.fromU64(<u64>den)));
 }
 
 function getStatus(iro: IRO, timestamp: BigInt): string {
@@ -56,9 +56,10 @@ export function handleCommit(event: CommitEvent): void {
   let shareIds = iro.shares;
   const userShareId = iro.id.concatI32(event.params._user.toI32());
   const iroContract = InitialRealEstateOfferingContract.bind(event.address);
+  const denominator = iroContract.DENOMINATOR();
   const userShareBPS = normalizeRatio(
-    iroContract,
     iroContract.userAmountAndShare(event.params._iroId, event.params._user).value1,
+    denominator,
   );
   if (!shareIds) {
     const userShare = new UserShare(userShareId);
@@ -93,14 +94,14 @@ export function handleCommit(event: CommitEvent): void {
 export function handleCreateIRO(event: CreateIROEvent): void {
   const iro = new IRO(Bytes.fromByteArray(Bytes.fromBigInt(event.params._iroId)));
   const iroContract = InitialRealEstateOfferingContract.bind(event.address);
+  const denominator = iroContract.DENOMINATOR();
 
   iro.iroId = event.params._iroId;
-  iro.status = getStatus(iro, event.block.timestamp);
   iro.listingOwner = event.params._listingOwner;
   iro.unitPrice = event.params._unitPrice;
-  iro.listingOwnerShare = normalizeRatio(iroContract, event.params._listingOwnerShare);
-  iro.treasuryFee = normalizeRatio(iroContract, event.params._treasuryFee);
-  iro.reservesFee = normalizeRatio(iroContract, event.params._reservesFee);
+  iro.listingOwnerShare = normalizeRatio(event.params._listingOwnerShare, denominator);
+  iro.treasuryFee = normalizeRatio(event.params._treasuryFee, denominator);
+  iro.reservesFee = normalizeRatio(event.params._reservesFee, denominator);
   iro.currency = Bytes.fromHexString(event.params._currency.toHexString());
   iro.currencyDecimals = new BigInt(ERC20Contract.bind(event.params._currency).decimals());
 
@@ -113,6 +114,7 @@ export function handleCreateIRO(event: CreateIROEvent): void {
   iro.totalFunding = iroInfo.totalFunding;
   iro.fundsWithdrawn = false;
   iro.ownerClaimed = false;
+  iro.status = getStatus(iro, event.block.timestamp);
   iro.save();
 
   // update IROSet
