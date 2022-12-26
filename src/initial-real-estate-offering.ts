@@ -23,7 +23,7 @@ function normalizeRatio(num: number, den: number): BigDecimal {
 function getStatus(iro: IRO, timestamp: BigInt): string {
   if (iro.start.gt(timestamp)) return "PENDING";
   if (iro.end.gt(timestamp)) {
-    if (iro.totalFunding.equals(iro.totalFunding)) return "SUCCESS";
+    if (iro.totalFunding.equals(iro.hardCap)) return "SUCCESS";
     return "ONGOING";
   }
   if (iro.end.le(timestamp)) {
