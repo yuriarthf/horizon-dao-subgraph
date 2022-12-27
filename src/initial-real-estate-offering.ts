@@ -52,40 +52,62 @@ export function handleCommit(event: CommitEvent): void {
   const iro = IRO.load(Bytes.fromByteArray(Bytes.fromBigInt(event.params._iroId)))!;
 
   iro.totalFunding = iro.totalFunding.plus(event.params._value);
-
-  let shareIds = iro.shares;
-  const userShareId = iro.id.concatI32(event.params._user.toI32());
+  const userShareId = iro.id.concat(Bytes.fromHexString(event.params._user.toHexString()));
   const iroContract = InitialRealEstateOfferingContract.bind(event.address);
   const denominator = iroContract.DENOMINATOR();
-  const userShareBPS = normalizeRatio(
-    iroContract.userAmountAndShare(event.params._iroId, event.params._user).value1,
-    denominator,
-  );
-  if (!shareIds) {
+  if (!iro.shares) {
     const userShare = new UserShare(userShareId);
-    userShare.address = event.params._user;
+    const userShareBPS = normalizeRatio(
+      iroContract.userAmountAndShare(event.params._iroId, event.params._user).value1,
+      denominator,
+    );
+    userShare.address = Bytes.fromHexString(event.params._user.toHexString());
     userShare.commitedFunds = event.params._value;
     userShare.amount = event.params._purchasedAmount;
     userShare.share = userShareBPS;
     userShare.claimed = false;
     userShare.save();
-    shareIds = [userShare.id];
+    iro.shares = [userShare.id];
   } else {
-    if (!shareIds.includes(userShareId)) {
+    if (!iro.shares!.includes(userShareId)) {
       const userShare = new UserShare(userShareId);
-      userShare.address = event.params._user;
+      const userShareBPS = normalizeRatio(
+        iroContract.userAmountAndShare(event.params._iroId, event.params._user).value1,
+        denominator,
+      );
+      userShare.address = Bytes.fromHexString(event.params._user.toHexString());
       userShare.commitedFunds = event.params._value;
       userShare.amount = event.params._purchasedAmount;
       userShare.share = userShareBPS;
       userShare.claimed = false;
       userShare.save();
-      shareIds.push(userShare.id);
+      const userShareIds = iro.shares!;
+      for (let i = 0; i < userShareIds.length; i++) {
+        const userShare = UserShare.load(userShareIds[i])!;
+        const userShareBPS = normalizeRatio(
+          iroContract.userAmountAndShare(event.params._iroId, Address.fromBytes(userShare.address)).value1,
+          denominator,
+        );
+        userShare.share = userShareBPS;
+        userShare.save();
+      }
+      userShareIds.push(userShareId);
+      iro.shares = userShareIds;
     } else {
-      const userShare = UserShare.load(userShareId)!;
-      userShare.commitedFunds = userShare.commitedFunds.plus(event.params._value);
-      userShare.amount = userShare.amount.plus(event.params._purchasedAmount);
-      userShare.share = userShareBPS;
-      userShare.save();
+      const userShareIds = iro.shares!;
+      for (let i = 0; i < userShareIds.length; i++) {
+        const userShare = UserShare.load(userShareIds[i])!;
+        const userShareBPS = normalizeRatio(
+          iroContract.userAmountAndShare(event.params._iroId, Address.fromBytes(userShare.address)).value1,
+          denominator,
+        );
+        userShare.share = userShareBPS;
+        if (userShareIds[i].equals(userShareId)) {
+          userShare.commitedFunds = userShare.commitedFunds.plus(event.params._value);
+          userShare.amount = userShare.amount.plus(event.params._purchasedAmount);
+        }
+        userShare.save();
+      }
     }
   }
   iro.save();
@@ -103,7 +125,8 @@ export function handleCreateIRO(event: CreateIROEvent): void {
   iro.treasuryFee = normalizeRatio(event.params._treasuryFee, denominator);
   iro.reservesFee = normalizeRatio(event.params._reservesFee, denominator);
   iro.currency = Bytes.fromHexString(event.params._currency.toHexString());
-  iro.currencyDecimals = new BigInt(ERC20Contract.bind(event.params._currency).decimals());
+  const currencyDecimals = ERC20Contract.bind(event.params._currency).decimals();
+  iro.currencyDecimals = BigInt.fromU32(<u32>currencyDecimals);
 
   // get IRO info from IRO contract
   const iroInfo = iroContract.getIRO(event.params._iroId);

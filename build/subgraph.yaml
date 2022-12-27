@@ -19,9 +19,9 @@ dataSources:
         - UserShare
       abis:
         - name: InitialRealEstateOffering
-          file: InitialRealEstateOffering/abis/InitialRealEstateOffering.json
+          file: InitialRealEstateOffering\abis\InitialRealEstateOffering.json
         - name: ERC20
-          file: InitialRealEstateOffering/abis/ERC20Extended.json
+          file: InitialRealEstateOffering\abis\ERC20Extended.json
       eventHandlers:
         - event: CashBack(indexed uint256,indexed address,indexed address,uint256)
           handler: handleCashBack
@@ -41,4 +41,4 @@ dataSources:
           handler: handleTokensClaimed
       blockHandlers:
         - handler: handleBlock
-      file: InitialRealEstateOffering/InitialRealEstateOffering.wasm
+      file: InitialRealEstateOffering\InitialRealEstateOffering.wasm
