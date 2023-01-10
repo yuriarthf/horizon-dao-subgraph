@@ -62,7 +62,7 @@ export function handleCommit(event: CommitEvent): void {
       denominator,
     );
     userShare.address = Bytes.fromHexString(event.params._user.toHexString());
-    userShare.commitedFunds = event.params._value;
+    userShare.committedFunds = event.params._value;
     userShare.amount = event.params._purchasedAmount;
     userShare.share = userShareBPS;
     userShare.claimed = false;
@@ -76,7 +76,7 @@ export function handleCommit(event: CommitEvent): void {
         denominator,
       );
       userShare.address = Bytes.fromHexString(event.params._user.toHexString());
-      userShare.commitedFunds = event.params._value;
+      userShare.committedFunds = event.params._value;
       userShare.amount = event.params._purchasedAmount;
       userShare.share = userShareBPS;
       userShare.claimed = false;
@@ -103,7 +103,7 @@ export function handleCommit(event: CommitEvent): void {
         );
         userShare.share = userShareBPS;
         if (userShareIds[i].equals(userShareId)) {
-          userShare.commitedFunds = userShare.commitedFunds.plus(event.params._value);
+          userShare.committedFunds = userShare.committedFunds.plus(event.params._value);
           userShare.amount = userShare.amount.plus(event.params._purchasedAmount);
         }
         userShare.save();

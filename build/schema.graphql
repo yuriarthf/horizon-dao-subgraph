@@ -1,7 +1,24 @@
+enum Status {
+  PENDING
+  ONGOING
+  SUCCESS
+  FAIL
+}
+
 type IROSet @entity {
   id: Bytes!
   entityIds: [Bytes!]
   iroIds: [BigInt!]
+}
+
+type UserShare @entity {
+  id: Bytes!
+  address: Bytes!
+  committedFunds: BigInt!
+  amount: BigInt!
+  share: BigDecimal!
+  claimed: Boolean!
+  iro: IRO! @derivedFrom(field: "shares")
 }
 
 type IRO @entity {
@@ -24,20 +41,4 @@ type IRO @entity {
   fundsWithdrawn: Boolean!
   ownerClaimed: Boolean!
   realEstateId: BigInt
-}
-
-type UserShare @entity {
-  id: Bytes!
-  address: Bytes!
-  commitedFunds: BigInt!
-  amount: BigInt!
-  share: BigDecimal!
-  claimed: Boolean!
-}
-
-enum Status {
-  PENDING,
-  ONGOING,
-  SUCCESS,
-  FAIL
 }

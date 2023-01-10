@@ -77,6 +77,94 @@ export class IROSet extends Entity {
   }
 }
 
+export class UserShare extends Entity {
+  constructor(id: Bytes) {
+    super();
+    this.set("id", Value.fromBytes(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save UserShare entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.BYTES,
+        `Entities of type UserShare must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("UserShare", id.toBytes().toHexString(), this);
+    }
+  }
+
+  static load(id: Bytes): UserShare | null {
+    return changetype<UserShare | null>(
+      store.get("UserShare", id.toHexString())
+    );
+  }
+
+  get id(): Bytes {
+    let value = this.get("id");
+    return value!.toBytes();
+  }
+
+  set id(value: Bytes) {
+    this.set("id", Value.fromBytes(value));
+  }
+
+  get address(): Bytes {
+    let value = this.get("address");
+    return value!.toBytes();
+  }
+
+  set address(value: Bytes) {
+    this.set("address", Value.fromBytes(value));
+  }
+
+  get committedFunds(): BigInt {
+    let value = this.get("committedFunds");
+    return value!.toBigInt();
+  }
+
+  set committedFunds(value: BigInt) {
+    this.set("committedFunds", Value.fromBigInt(value));
+  }
+
+  get amount(): BigInt {
+    let value = this.get("amount");
+    return value!.toBigInt();
+  }
+
+  set amount(value: BigInt) {
+    this.set("amount", Value.fromBigInt(value));
+  }
+
+  get share(): BigDecimal {
+    let value = this.get("share");
+    return value!.toBigDecimal();
+  }
+
+  set share(value: BigDecimal) {
+    this.set("share", Value.fromBigDecimal(value));
+  }
+
+  get claimed(): boolean {
+    let value = this.get("claimed");
+    return value!.toBoolean();
+  }
+
+  set claimed(value: boolean) {
+    this.set("claimed", Value.fromBoolean(value));
+  }
+
+  get iro(): Bytes {
+    let value = this.get("iro");
+    return value!.toBytes();
+  }
+
+  set iro(value: Bytes) {
+    this.set("iro", Value.fromBytes(value));
+  }
+}
+
 export class IRO extends Entity {
   constructor(id: Bytes) {
     super();
@@ -284,84 +372,5 @@ export class IRO extends Entity {
     } else {
       this.set("realEstateId", Value.fromBigInt(<BigInt>value));
     }
-  }
-}
-
-export class UserShare extends Entity {
-  constructor(id: Bytes) {
-    super();
-    this.set("id", Value.fromBytes(id));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id != null, "Cannot save UserShare entity without an ID");
-    if (id) {
-      assert(
-        id.kind == ValueKind.BYTES,
-        `Entities of type UserShare must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`
-      );
-      store.set("UserShare", id.toBytes().toHexString(), this);
-    }
-  }
-
-  static load(id: Bytes): UserShare | null {
-    return changetype<UserShare | null>(
-      store.get("UserShare", id.toHexString())
-    );
-  }
-
-  get id(): Bytes {
-    let value = this.get("id");
-    return value!.toBytes();
-  }
-
-  set id(value: Bytes) {
-    this.set("id", Value.fromBytes(value));
-  }
-
-  get address(): Bytes {
-    let value = this.get("address");
-    return value!.toBytes();
-  }
-
-  set address(value: Bytes) {
-    this.set("address", Value.fromBytes(value));
-  }
-
-  get commitedFunds(): BigInt {
-    let value = this.get("commitedFunds");
-    return value!.toBigInt();
-  }
-
-  set commitedFunds(value: BigInt) {
-    this.set("commitedFunds", Value.fromBigInt(value));
-  }
-
-  get amount(): BigInt {
-    let value = this.get("amount");
-    return value!.toBigInt();
-  }
-
-  set amount(value: BigInt) {
-    this.set("amount", Value.fromBigInt(value));
-  }
-
-  get share(): BigDecimal {
-    let value = this.get("share");
-    return value!.toBigDecimal();
-  }
-
-  set share(value: BigDecimal) {
-    this.set("share", Value.fromBigDecimal(value));
-  }
-
-  get claimed(): boolean {
-    let value = this.get("claimed");
-    return value!.toBoolean();
-  }
-
-  set claimed(value: boolean) {
-    this.set("claimed", Value.fromBoolean(value));
   }
 }
