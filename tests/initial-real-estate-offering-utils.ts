@@ -1,4 +1,4 @@
-import { newMockEvent } from "matchstick-as";
+import { newMockEvent, createMockedFunction } from "matchstick-as";
 import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts";
 import {
   AdminChanged,
@@ -17,6 +17,10 @@ import {
   TokensClaimed,
   Upgraded,
 } from "../generated/InitialRealEstateOffering/InitialRealEstateOffering";
+
+export function mockIROContract(address: Address): void {
+  createMockedFunction(address, "DENOMINATOR", "DENOMINATOR():uint16").returns([ethereum.Value.fromString("10000")]);
+}
 
 export function createAdminChangedEvent(previousAdmin: Address, newAdmin: Address): AdminChanged {
   let adminChangedEvent = changetype<AdminChanged>(newMockEvent());
