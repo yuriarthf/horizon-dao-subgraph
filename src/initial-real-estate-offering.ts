@@ -180,7 +180,7 @@ export function handleRealEstateCreated(event: RealEstateCreatedEvent): void {
 export function handleTokensClaimed(event: TokensClaimedEvent): void {
   const iro = IRO.load(Bytes.fromByteArray(Bytes.fromBigInt(event.params._iroId)))!;
 
-  const userShare = UserShare.load(iro.id.concatI32(event.params._by.toI32()))!;
+  const userShare = UserShare.load(iro.id.concat(Bytes.fromHexString(event.params._by.toHexString())))!;
   userShare.claimed = true;
   userShare.save();
 }
