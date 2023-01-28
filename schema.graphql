@@ -42,3 +42,16 @@ type IRO @entity {
   ownerClaimed: Boolean!
   realEstateId: BigInt
 }
+
+type Balance @entity {
+  id: Bytes!
+  tokenId: BigInt!
+  amount: BigInt!
+  account: RealEstateAccount! @derivedFrom(field: "balances")
+}
+
+type RealEstateAccount @entity {
+  id: Bytes!
+  address: Bytes!
+  balances: [Balance!]
+}
