@@ -40,3 +40,39 @@ export function handleTransferSingle(event: TransferSingleEvent): void {
     toBalance.save();
   }
 }
+
+export function handleTransferBatch(event: TransferBatchEvent): void {
+  for (let i = 0; i < event.params.ids.length; i++) {
+    const fromBalanceId = Bytes.fromBigInt(event.params.ids[i]).concat(
+      Bytes.fromHexString(event.params.from.toHexString()),
+    );
+    const fromBalance = Balance.load(fromBalanceId)!;
+    fromBalance.amount = fromBalance.amount.minus(event.params.values[i]);
+
+    const toBalanceId = Bytes.fromBigInt(event.params.ids[i]).concat(
+      Bytes.fromHexString(event.params.to.toHexString()),
+    );
+    let toBalance = Balance.load(toBalanceId);
+    if (!toBalance) {
+      toBalance = new Balance(toBalanceId);
+      toBalance.tokenId = event.params.ids[i];
+      toBalance.amount = event.params.values[i];
+      toBalance.save();
+      const toAccountId = Bytes.fromHexString(event.params.to.toHexString());
+      let toAccount = RealEstateAccount.load(toAccountId);
+      if (!toAccount) {
+        toAccount = new RealEstateAccount(toAccountId);
+        toAccount.address = Bytes.fromHexString(event.params.to.toHexString());
+        if (!toAccount.balances) {
+          toAccount.balances = [toBalance.id];
+        } else {
+          toAccount.balances.push(toBalance.id);
+        }
+        toAccount.save();
+      }
+    } else {
+      toBalance.amount = toBalance.amount.plus(event.params.values[i]);
+      toBalance.save();
+    }
+  }
+}
