@@ -42,3 +42,25 @@ dataSources:
       blockHandlers:
         - handler: handleBlock
       file: InitialRealEstateOffering\InitialRealEstateOffering.wasm
+  - kind: ethereum
+    name: RealEstateNFT
+    network: goerli
+    source:
+      address: "0xb49d1cFDE6Da2b0cAAE2E827E7E6c8867c722157"
+      abi: RealEstateNFT
+      startBlock: 8317051
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - RealEstateAccounts
+      abis:
+        - name: RealEstateNFT
+          file: RealEstateNFT\abis\RealEstateNFT.json
+      eventHandlers:
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleTransferSingle
+        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
+          handler: handleTransferBatch
+      file: RealEstateNFT\RealEstateNFT.wasm

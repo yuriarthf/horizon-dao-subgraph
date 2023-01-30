@@ -9,14 +9,16 @@ import { Balance, RealEstateAccount } from "../generated/schema";
 
 export function handleTransferSingle(event: TransferSingleEvent): void {
   if (!event.params.from.equals(Address.zero())) {
-    const fromBalanceId = Bytes.fromBigInt(event.params.id).concat(
-      Bytes.fromHexString(event.params.from.toHexString()),
+    const fromBalanceId = Bytes.fromByteArray(
+      Bytes.fromBigInt(event.params.id).concat(Bytes.fromHexString(event.params.from.toHexString())),
     );
     const fromBalance = Balance.load(fromBalanceId)!;
     fromBalance.amount = fromBalance.amount.minus(event.params.value);
   }
 
-  const toBalanceId = Bytes.fromBigInt(event.params.id).concat(Bytes.fromHexString(event.params.to.toHexString()));
+  const toBalanceId = Bytes.fromByteArray(
+    Bytes.fromBigInt(event.params.id).concat(Bytes.fromHexString(event.params.to.toHexString())),
+  );
   let toBalance = Balance.load(toBalanceId);
   if (!toBalance) {
     toBalance = new Balance(toBalanceId);
@@ -31,7 +33,7 @@ export function handleTransferSingle(event: TransferSingleEvent): void {
       if (!toAccount.balances) {
         toAccount.balances = [toBalance.id];
       } else {
-        toAccount.balances.push(toBalance.id);
+        toAccount.balances!.push(toBalance.id);
       }
       toAccount.save();
     }
@@ -43,14 +45,14 @@ export function handleTransferSingle(event: TransferSingleEvent): void {
 
 export function handleTransferBatch(event: TransferBatchEvent): void {
   for (let i = 0; i < event.params.ids.length; i++) {
-    const fromBalanceId = Bytes.fromBigInt(event.params.ids[i]).concat(
-      Bytes.fromHexString(event.params.from.toHexString()),
+    const fromBalanceId = Bytes.fromByteArray(
+      Bytes.fromBigInt(event.params.ids[i]).concat(Bytes.fromHexString(event.params.from.toHexString())),
     );
     const fromBalance = Balance.load(fromBalanceId)!;
     fromBalance.amount = fromBalance.amount.minus(event.params.values[i]);
 
-    const toBalanceId = Bytes.fromBigInt(event.params.ids[i]).concat(
-      Bytes.fromHexString(event.params.to.toHexString()),
+    const toBalanceId = Bytes.fromByteArray(
+      Bytes.fromBigInt(event.params.ids[i]).concat(Bytes.fromHexString(event.params.to.toHexString())),
     );
     let toBalance = Balance.load(toBalanceId);
     if (!toBalance) {
@@ -66,7 +68,7 @@ export function handleTransferBatch(event: TransferBatchEvent): void {
         if (!toAccount.balances) {
           toAccount.balances = [toBalance.id];
         } else {
-          toAccount.balances.push(toBalance.id);
+          toAccount.balances!.push(toBalance.id);
         }
         toAccount.save();
       }
