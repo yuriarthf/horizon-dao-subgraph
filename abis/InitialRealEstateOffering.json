@@ -122,30 +122,6 @@
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "_unitPrice",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint16",
-        "name": "_listingOwnerShare",
-        "type": "uint16"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint16",
-        "name": "_treasuryFee",
-        "type": "uint16"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint16",
-        "name": "_reservesFee",
-        "type": "uint16"
-      },
-      {
-        "indexed": false,
         "internalType": "uint64",
         "name": "_start",
         "type": "uint64"
@@ -155,6 +131,18 @@
         "internalType": "uint64",
         "name": "_end",
         "type": "uint64"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_unitPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_targetFunding",
+        "type": "uint256"
       }
     ],
     "name": "CreateIRO",
@@ -176,12 +164,6 @@
         "type": "address"
       },
       {
-        "indexed": true,
-        "internalType": "bool",
-        "name": "_realEstateFundsSet",
-        "type": "bool"
-      },
-      {
         "indexed": false,
         "internalType": "uint256",
         "name": "_listingOwnerAmount",
@@ -190,13 +172,13 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_treasuryAmount",
+        "name": "_treasuryFee",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_realEstateReservesAmount",
+        "name": "_operationFee",
         "type": "uint256"
       }
     ],
@@ -214,37 +196,6 @@
       }
     ],
     "name": "Initialized",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "_iroId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "_by",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "_to",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "_amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "OwnerTokensClaimed",
     "type": "event"
   },
   {
@@ -302,25 +253,6 @@
       }
     ],
     "name": "SetBaseCurrency",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "_by",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "_realEstateReserves",
-        "type": "address"
-      }
-    ],
-    "name": "SetRealEstateReserves",
     "type": "event"
   },
   {
@@ -467,19 +399,14 @@
         "type": "address"
       },
       {
-        "internalType": "uint16",
-        "name": "_listingOwnerShare",
-        "type": "uint16"
-      },
-      {
-        "internalType": "uint16",
+        "internalType": "uint256",
         "name": "_treasuryFee",
-        "type": "uint16"
+        "type": "uint256"
       },
       {
-        "internalType": "uint16",
-        "name": "_reservesFee",
-        "type": "uint16"
+        "internalType": "uint256",
+        "name": "_operationFee",
+        "type": "uint256"
       },
       {
         "internalType": "uint64",
@@ -488,12 +415,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "_softCap",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_hardCap",
+        "name": "_assetPrice",
         "type": "uint256"
       },
       {
@@ -533,6 +455,44 @@
         "type": "uint256"
       }
     ],
+    "name": "currentTotalSupply",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_iroId",
+        "type": "uint256"
+      }
+    ],
+    "name": "expectedTotalSupply",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "expectedTotalSupply_",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_iroId",
+        "type": "uint256"
+      }
+    ],
     "name": "getIRO",
     "outputs": [
       {
@@ -548,21 +508,6 @@
             "type": "uint64"
           },
           {
-            "internalType": "uint16",
-            "name": "treasuryFee",
-            "type": "uint16"
-          },
-          {
-            "internalType": "uint16",
-            "name": "reservesFee",
-            "type": "uint16"
-          },
-          {
-            "internalType": "uint16",
-            "name": "listingOwnerShare",
-            "type": "uint16"
-          },
-          {
             "internalType": "uint64",
             "name": "end",
             "type": "uint64"
@@ -574,12 +519,17 @@
           },
           {
             "internalType": "uint256",
-            "name": "softCap",
+            "name": "treasuryFee",
             "type": "uint256"
           },
           {
             "internalType": "uint256",
-            "name": "hardCap",
+            "name": "operationFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "targetFunding",
             "type": "uint256"
           },
           {
@@ -639,11 +589,6 @@
       },
       {
         "internalType": "address",
-        "name": "_realEstateReserves",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
         "name": "_currency",
         "type": "address"
       }
@@ -664,43 +609,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_iroId",
-        "type": "uint256"
-      }
-    ],
-    "name": "listingOwnerAmount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_iroId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_to",
-        "type": "address"
-      }
-    ],
-    "name": "listingOwnerClaim",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -799,19 +707,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "realEstateReserves",
-    "outputs": [
-      {
-        "internalType": "contract IRealEstateReserves",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -854,19 +749,6 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_realEstateReserves",
-        "type": "address"
-      }
-    ],
-    "name": "setRealEstateReserves",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
         "name": "_treasury",
         "type": "address"
       }
@@ -884,36 +766,32 @@
         "type": "uint256"
       }
     ],
-    "name": "totalSupply",
+    "name": "targetCapInfo",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_iroId",
-        "type": "uint256"
-      }
-    ],
-    "name": "totalSupplyInterval",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "minTotalSupply",
+        "name": "assetPrice",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "maxTotalSupply",
+        "name": "treasuryFee",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "operationFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint16",
+        "name": "treasuryFeeBps",
+        "type": "uint16"
+      },
+      {
+        "internalType": "uint16",
+        "name": "operationFeeBps",
+        "type": "uint16"
       }
     ],
     "stateMutability": "view",

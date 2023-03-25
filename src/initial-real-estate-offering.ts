@@ -163,13 +163,6 @@ export function handleFundsWithdrawn(event: FundsWithdrawnEvent): void {
   iro.save();
 }
 
-export function handleOwnerTokensClaimed(event: OwnerTokensClaimedEvent): void {
-  const iro = IRO.load(Bytes.fromByteArray(Bytes.fromBigInt(event.params._iroId)))!;
-
-  iro.ownerClaimed = true;
-  iro.save();
-}
-
 export function handleRealEstateCreated(event: RealEstateCreatedEvent): void {
   const iro = IRO.load(Bytes.fromByteArray(Bytes.fromBigInt(event.params._iroId)))!;
 
