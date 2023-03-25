@@ -5,7 +5,6 @@ import {
   Commit as CommitEvent,
   CreateIRO as CreateIROEvent,
   FundsWithdrawn as FundsWithdrawnEvent,
-  OwnerTokensClaimed as OwnerTokensClaimedEvent,
   RealEstateCreated as RealEstateCreatedEvent,
   TokensClaimed as TokensClaimedEvent,
   InitialRealEstateOffering as InitialRealEstateOfferingContract,
@@ -23,11 +22,11 @@ function normalizeRatio(num: number, den: number): BigDecimal {
 function getStatus(iro: IRO, timestamp: BigInt): string {
   if (iro.start.gt(timestamp)) return "PENDING";
   if (iro.end.gt(timestamp)) {
-    if (iro.totalFunding.equals(iro.hardCap)) return "SUCCESS";
-    return "ONGOING";
+    if (iro.totalFunding.equals(iro.targetFunding)) return "SUCCESS";
+    return "FUNDING";
   }
   if (iro.end.le(timestamp)) {
-    if (iro.softCap.gt(iro.totalFunding)) return "FAIL";
+    if (iro.targetFunding.gt(iro.totalFunding)) return "FAIL";
     return "SUCCESS";
   }
   return "FAIL";
@@ -116,28 +115,26 @@ export function handleCommit(event: CommitEvent): void {
 export function handleCreateIRO(event: CreateIROEvent): void {
   const iro = new IRO(Bytes.fromByteArray(Bytes.fromBigInt(event.params._iroId)));
   const iroContract = InitialRealEstateOfferingContract.bind(event.address);
-  const denominator = iroContract.DENOMINATOR();
-
+  //const denominator = iroContract.DENOMINATOR();
   iro.iroId = event.params._iroId;
-  iro.listingOwner = event.params._listingOwner;
-  iro.unitPrice = event.params._unitPrice;
-  iro.listingOwnerShare = normalizeRatio(event.params._listingOwnerShare, denominator);
-  iro.treasuryFee = normalizeRatio(event.params._treasuryFee, denominator);
-  iro.reservesFee = normalizeRatio(event.params._reservesFee, denominator);
-  iro.currency = Bytes.fromHexString(event.params._currency.toHexString());
-  const currencyDecimals = ERC20Contract.bind(event.params._currency).decimals();
-  iro.currencyDecimals = BigInt.fromU32(<u32>currencyDecimals);
 
   // get IRO info from IRO contract
   const iroInfo = iroContract.getIRO(event.params._iroId);
-  iro.softCap = iroInfo.softCap;
-  iro.hardCap = iroInfo.hardCap;
-  iro.start = event.params._start;
-  iro.end = event.params._end;
+  iro.listingOwner = iroInfo.listingOwner;
+  iro.start = iroInfo.start;
+  iro.end = iroInfo.end;
+  iro.currency = Bytes.fromHexString(iroInfo.currency.toHexString());
+  iro.treasuryFee = iroInfo.treasuryFee;
+  iro.operationFee = iroInfo.operationFee;
+  iro.targetFunding = iroInfo.targetFunding;
+  iro.unitPrice = iroInfo.unitPrice;
   iro.totalFunding = iroInfo.totalFunding;
   iro.fundsWithdrawn = false;
-  iro.ownerClaimed = false;
   iro.status = getStatus(iro, event.block.timestamp);
+
+  const currencyDecimals = ERC20Contract.bind(iroInfo.currency).decimals();
+  iro.currencyDecimals = BigInt.fromU32(<u32>currencyDecimals);
+
   iro.save();
 
   // update IROSet
@@ -188,7 +185,7 @@ export function handleBlock(block: ethereum.Block): void {
     if (!entityIds) return;
     for (let i = 0; i < entityIds.length; i++) {
       const iro = IRO.load(entityIds[i])!;
-      if (["PENDING", "ONGOING"].includes(iro.status)) {
+      if (["PENDING", "FUNDING"].includes(iro.status)) {
         const status = getStatus(iro, block.timestamp);
         if (iro.status !== status) {
           iro.status = status;

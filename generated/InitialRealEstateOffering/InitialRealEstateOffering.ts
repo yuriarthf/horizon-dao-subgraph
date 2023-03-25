@@ -139,28 +139,20 @@ export class CreateIRO__Params {
     return this._event.parameters[2].value.toAddress();
   }
 
-  get _unitPrice(): BigInt {
+  get _start(): BigInt {
     return this._event.parameters[3].value.toBigInt();
   }
 
-  get _listingOwnerShare(): i32 {
-    return this._event.parameters[4].value.toI32();
-  }
-
-  get _treasuryFee(): i32 {
-    return this._event.parameters[5].value.toI32();
-  }
-
-  get _reservesFee(): i32 {
-    return this._event.parameters[6].value.toI32();
-  }
-
-  get _start(): BigInt {
-    return this._event.parameters[7].value.toBigInt();
-  }
-
   get _end(): BigInt {
-    return this._event.parameters[8].value.toBigInt();
+    return this._event.parameters[4].value.toBigInt();
+  }
+
+  get _unitPrice(): BigInt {
+    return this._event.parameters[5].value.toBigInt();
+  }
+
+  get _targetFunding(): BigInt {
+    return this._event.parameters[6].value.toBigInt();
   }
 }
 
@@ -185,20 +177,16 @@ export class FundsWithdrawn__Params {
     return this._event.parameters[1].value.toAddress();
   }
 
-  get _realEstateFundsSet(): boolean {
-    return this._event.parameters[2].value.toBoolean();
+  get _listingOwnerAmount(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
   }
 
-  get _listingOwnerAmount(): BigInt {
+  get _treasuryFee(): BigInt {
     return this._event.parameters[3].value.toBigInt();
   }
 
-  get _treasuryAmount(): BigInt {
+  get _operationFee(): BigInt {
     return this._event.parameters[4].value.toBigInt();
-  }
-
-  get _realEstateReservesAmount(): BigInt {
-    return this._event.parameters[5].value.toBigInt();
   }
 }
 
@@ -217,36 +205,6 @@ export class Initialized__Params {
 
   get version(): i32 {
     return this._event.parameters[0].value.toI32();
-  }
-}
-
-export class OwnerTokensClaimed extends ethereum.Event {
-  get params(): OwnerTokensClaimed__Params {
-    return new OwnerTokensClaimed__Params(this);
-  }
-}
-
-export class OwnerTokensClaimed__Params {
-  _event: OwnerTokensClaimed;
-
-  constructor(event: OwnerTokensClaimed) {
-    this._event = event;
-  }
-
-  get _iroId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get _by(): Address {
-    return this._event.parameters[1].value.toAddress();
-  }
-
-  get _to(): Address {
-    return this._event.parameters[2].value.toAddress();
-  }
-
-  get _amount(): BigInt {
-    return this._event.parameters[3].value.toBigInt();
   }
 }
 
@@ -312,28 +270,6 @@ export class SetBaseCurrency__Params {
   }
 
   get _currency(): Address {
-    return this._event.parameters[1].value.toAddress();
-  }
-}
-
-export class SetRealEstateReserves extends ethereum.Event {
-  get params(): SetRealEstateReserves__Params {
-    return new SetRealEstateReserves__Params(this);
-  }
-}
-
-export class SetRealEstateReserves__Params {
-  _event: SetRealEstateReserves;
-
-  constructor(event: SetRealEstateReserves) {
-    this._event = event;
-  }
-
-  get _by(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get _realEstateReserves(): Address {
     return this._event.parameters[1].value.toAddress();
   }
 }
@@ -417,65 +353,90 @@ export class InitialRealEstateOffering__getIROResultValue0Struct extends ethereu
     return this[1].toBigInt();
   }
 
-  get treasuryFee(): i32 {
-    return this[2].toI32();
-  }
-
-  get reservesFee(): i32 {
-    return this[3].toI32();
-  }
-
-  get listingOwnerShare(): i32 {
-    return this[4].toI32();
-  }
-
   get end(): BigInt {
-    return this[5].toBigInt();
+    return this[2].toBigInt();
   }
 
   get currency(): Address {
-    return this[6].toAddress();
+    return this[3].toAddress();
   }
 
-  get softCap(): BigInt {
-    return this[7].toBigInt();
+  get treasuryFee(): BigInt {
+    return this[4].toBigInt();
   }
 
-  get hardCap(): BigInt {
-    return this[8].toBigInt();
+  get operationFee(): BigInt {
+    return this[5].toBigInt();
+  }
+
+  get targetFunding(): BigInt {
+    return this[6].toBigInt();
   }
 
   get unitPrice(): BigInt {
-    return this[9].toBigInt();
+    return this[7].toBigInt();
   }
 
   get totalFunding(): BigInt {
-    return this[10].toBigInt();
+    return this[8].toBigInt();
   }
 }
 
-export class InitialRealEstateOffering__totalSupplyIntervalResult {
+export class InitialRealEstateOffering__targetCapInfoResult {
   value0: BigInt;
   value1: BigInt;
+  value2: BigInt;
+  value3: i32;
+  value4: i32;
 
-  constructor(value0: BigInt, value1: BigInt) {
+  constructor(
+    value0: BigInt,
+    value1: BigInt,
+    value2: BigInt,
+    value3: i32,
+    value4: i32
+  ) {
     this.value0 = value0;
     this.value1 = value1;
+    this.value2 = value2;
+    this.value3 = value3;
+    this.value4 = value4;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
     let map = new TypedMap<string, ethereum.Value>();
     map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
+    map.set(
+      "value3",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(this.value3))
+    );
+    map.set(
+      "value4",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(this.value4))
+    );
     return map;
   }
 
-  getMinTotalSupply(): BigInt {
+  getAssetPrice(): BigInt {
     return this.value0;
   }
 
-  getMaxTotalSupply(): BigInt {
+  getTreasuryFee(): BigInt {
     return this.value1;
+  }
+
+  getOperationFee(): BigInt {
+    return this.value2;
+  }
+
+  getTreasuryFeeBps(): i32 {
+    return this.value3;
+  }
+
+  getOperationFeeBps(): i32 {
+    return this.value4;
   }
 }
 
@@ -567,10 +528,56 @@ export class InitialRealEstateOffering extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
+  currentTotalSupply(_iroId: BigInt): BigInt {
+    let result = super.call(
+      "currentTotalSupply",
+      "currentTotalSupply(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_iroId)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_currentTotalSupply(_iroId: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "currentTotalSupply",
+      "currentTotalSupply(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_iroId)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  expectedTotalSupply(_iroId: BigInt): BigInt {
+    let result = super.call(
+      "expectedTotalSupply",
+      "expectedTotalSupply(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_iroId)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_expectedTotalSupply(_iroId: BigInt): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "expectedTotalSupply",
+      "expectedTotalSupply(uint256):(uint256)",
+      [ethereum.Value.fromUnsignedBigInt(_iroId)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   getIRO(_iroId: BigInt): InitialRealEstateOffering__getIROResultValue0Struct {
     let result = super.call(
       "getIRO",
-      "getIRO(uint256):((address,uint64,uint16,uint16,uint16,uint64,address,uint256,uint256,uint256,uint256))",
+      "getIRO(uint256):((address,uint64,uint64,address,uint256,uint256,uint256,uint256,uint256))",
       [ethereum.Value.fromUnsignedBigInt(_iroId)]
     );
 
@@ -584,7 +591,7 @@ export class InitialRealEstateOffering extends ethereum.SmartContract {
   ): ethereum.CallResult<InitialRealEstateOffering__getIROResultValue0Struct> {
     let result = super.tryCall(
       "getIRO",
-      "getIRO(uint256):((address,uint64,uint16,uint16,uint16,uint64,address,uint256,uint256,uint256,uint256))",
+      "getIRO(uint256):((address,uint64,uint64,address,uint256,uint256,uint256,uint256,uint256))",
       [ethereum.Value.fromUnsignedBigInt(_iroId)]
     );
     if (result.reverted) {
@@ -625,29 +632,6 @@ export class InitialRealEstateOffering extends ethereum.SmartContract {
 
   try_iroLength(): ethereum.CallResult<BigInt> {
     let result = super.tryCall("iroLength", "iroLength():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  listingOwnerAmount(_iroId: BigInt): BigInt {
-    let result = super.call(
-      "listingOwnerAmount",
-      "listingOwnerAmount(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_iroId)]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_listingOwnerAmount(_iroId: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "listingOwnerAmount",
-      "listingOwnerAmount(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_iroId)]
-    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -768,29 +752,6 @@ export class InitialRealEstateOffering extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  realEstateReserves(): Address {
-    let result = super.call(
-      "realEstateReserves",
-      "realEstateReserves():(address)",
-      []
-    );
-
-    return result[0].toAddress();
-  }
-
-  try_realEstateReserves(): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "realEstateReserves",
-      "realEstateReserves():(address)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
   remainingTokens(_iroId: BigInt): BigInt {
     let result = super.call(
       "remainingTokens",
@@ -814,48 +775,30 @@ export class InitialRealEstateOffering extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  totalSupply(_iroId: BigInt): BigInt {
-    let result = super.call("totalSupply", "totalSupply(uint256):(uint256)", [
-      ethereum.Value.fromUnsignedBigInt(_iroId)
-    ]);
-
-    return result[0].toBigInt();
-  }
-
-  try_totalSupply(_iroId: BigInt): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "totalSupply",
-      "totalSupply(uint256):(uint256)",
-      [ethereum.Value.fromUnsignedBigInt(_iroId)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  totalSupplyInterval(
+  targetCapInfo(
     _iroId: BigInt
-  ): InitialRealEstateOffering__totalSupplyIntervalResult {
+  ): InitialRealEstateOffering__targetCapInfoResult {
     let result = super.call(
-      "totalSupplyInterval",
-      "totalSupplyInterval(uint256):(uint256,uint256)",
+      "targetCapInfo",
+      "targetCapInfo(uint256):(uint256,uint256,uint256,uint16,uint16)",
       [ethereum.Value.fromUnsignedBigInt(_iroId)]
     );
 
-    return new InitialRealEstateOffering__totalSupplyIntervalResult(
+    return new InitialRealEstateOffering__targetCapInfoResult(
       result[0].toBigInt(),
-      result[1].toBigInt()
+      result[1].toBigInt(),
+      result[2].toBigInt(),
+      result[3].toI32(),
+      result[4].toI32()
     );
   }
 
-  try_totalSupplyInterval(
+  try_targetCapInfo(
     _iroId: BigInt
-  ): ethereum.CallResult<InitialRealEstateOffering__totalSupplyIntervalResult> {
+  ): ethereum.CallResult<InitialRealEstateOffering__targetCapInfoResult> {
     let result = super.tryCall(
-      "totalSupplyInterval",
-      "totalSupplyInterval(uint256):(uint256,uint256)",
+      "targetCapInfo",
+      "targetCapInfo(uint256):(uint256,uint256,uint256,uint16,uint16)",
       [ethereum.Value.fromUnsignedBigInt(_iroId)]
     );
     if (result.reverted) {
@@ -863,9 +806,12 @@ export class InitialRealEstateOffering extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new InitialRealEstateOffering__totalSupplyIntervalResult(
+      new InitialRealEstateOffering__targetCapInfoResult(
         value[0].toBigInt(),
-        value[1].toBigInt()
+        value[1].toBigInt(),
+        value[2].toBigInt(),
+        value[3].toI32(),
+        value[4].toI32()
       )
     );
   }
@@ -1018,36 +964,28 @@ export class CreateIROCall__Inputs {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get _listingOwnerShare(): i32 {
-    return this._call.inputValues[1].value.toI32();
+  get _treasuryFee(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
   }
 
-  get _treasuryFee(): i32 {
-    return this._call.inputValues[2].value.toI32();
-  }
-
-  get _reservesFee(): i32 {
-    return this._call.inputValues[3].value.toI32();
+  get _operationFee(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
   }
 
   get _duration(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+
+  get _assetPrice(): BigInt {
     return this._call.inputValues[4].value.toBigInt();
   }
 
-  get _softCap(): BigInt {
+  get _unitPrice(): BigInt {
     return this._call.inputValues[5].value.toBigInt();
   }
 
-  get _hardCap(): BigInt {
-    return this._call.inputValues[6].value.toBigInt();
-  }
-
-  get _unitPrice(): BigInt {
-    return this._call.inputValues[7].value.toBigInt();
-  }
-
   get _startOffset(): BigInt {
-    return this._call.inputValues[8].value.toBigInt();
+    return this._call.inputValues[6].value.toBigInt();
   }
 }
 
@@ -1088,12 +1026,8 @@ export class InitializeCall__Inputs {
     return this._call.inputValues[2].value.toAddress();
   }
 
-  get _realEstateReserves(): Address {
-    return this._call.inputValues[3].value.toAddress();
-  }
-
   get _currency(): Address {
-    return this._call.inputValues[4].value.toAddress();
+    return this._call.inputValues[3].value.toAddress();
   }
 }
 
@@ -1101,40 +1035,6 @@ export class InitializeCall__Outputs {
   _call: InitializeCall;
 
   constructor(call: InitializeCall) {
-    this._call = call;
-  }
-}
-
-export class ListingOwnerClaimCall extends ethereum.Call {
-  get inputs(): ListingOwnerClaimCall__Inputs {
-    return new ListingOwnerClaimCall__Inputs(this);
-  }
-
-  get outputs(): ListingOwnerClaimCall__Outputs {
-    return new ListingOwnerClaimCall__Outputs(this);
-  }
-}
-
-export class ListingOwnerClaimCall__Inputs {
-  _call: ListingOwnerClaimCall;
-
-  constructor(call: ListingOwnerClaimCall) {
-    this._call = call;
-  }
-
-  get _iroId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-
-  get _to(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-}
-
-export class ListingOwnerClaimCall__Outputs {
-  _call: ListingOwnerClaimCall;
-
-  constructor(call: ListingOwnerClaimCall) {
     this._call = call;
   }
 }
@@ -1191,36 +1091,6 @@ export class SetCurrencyCall__Outputs {
   _call: SetCurrencyCall;
 
   constructor(call: SetCurrencyCall) {
-    this._call = call;
-  }
-}
-
-export class SetRealEstateReservesCall extends ethereum.Call {
-  get inputs(): SetRealEstateReservesCall__Inputs {
-    return new SetRealEstateReservesCall__Inputs(this);
-  }
-
-  get outputs(): SetRealEstateReservesCall__Outputs {
-    return new SetRealEstateReservesCall__Outputs(this);
-  }
-}
-
-export class SetRealEstateReservesCall__Inputs {
-  _call: SetRealEstateReservesCall;
-
-  constructor(call: SetRealEstateReservesCall) {
-    this._call = call;
-  }
-
-  get _realEstateReserves(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-}
-
-export class SetRealEstateReservesCall__Outputs {
-  _call: SetRealEstateReservesCall;
-
-  constructor(call: SetRealEstateReservesCall) {
     this._call = call;
   }
 }

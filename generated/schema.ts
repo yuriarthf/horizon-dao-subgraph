@@ -223,51 +223,6 @@ export class IRO extends Entity {
     this.set("listingOwner", Value.fromBytes(value));
   }
 
-  get unitPrice(): BigInt {
-    let value = this.get("unitPrice");
-    return value!.toBigInt();
-  }
-
-  set unitPrice(value: BigInt) {
-    this.set("unitPrice", Value.fromBigInt(value));
-  }
-
-  get listingOwnerShare(): BigDecimal {
-    let value = this.get("listingOwnerShare");
-    return value!.toBigDecimal();
-  }
-
-  set listingOwnerShare(value: BigDecimal) {
-    this.set("listingOwnerShare", Value.fromBigDecimal(value));
-  }
-
-  get treasuryFee(): BigDecimal {
-    let value = this.get("treasuryFee");
-    return value!.toBigDecimal();
-  }
-
-  set treasuryFee(value: BigDecimal) {
-    this.set("treasuryFee", Value.fromBigDecimal(value));
-  }
-
-  get reservesFee(): BigDecimal {
-    let value = this.get("reservesFee");
-    return value!.toBigDecimal();
-  }
-
-  set reservesFee(value: BigDecimal) {
-    this.set("reservesFee", Value.fromBigDecimal(value));
-  }
-
-  get currency(): Bytes {
-    let value = this.get("currency");
-    return value!.toBytes();
-  }
-
-  set currency(value: Bytes) {
-    this.set("currency", Value.fromBytes(value));
-  }
-
   get currencyDecimals(): BigInt {
     let value = this.get("currencyDecimals");
     return value!.toBigInt();
@@ -275,24 +230,6 @@ export class IRO extends Entity {
 
   set currencyDecimals(value: BigInt) {
     this.set("currencyDecimals", Value.fromBigInt(value));
-  }
-
-  get softCap(): BigInt {
-    let value = this.get("softCap");
-    return value!.toBigInt();
-  }
-
-  set softCap(value: BigInt) {
-    this.set("softCap", Value.fromBigInt(value));
-  }
-
-  get hardCap(): BigInt {
-    let value = this.get("hardCap");
-    return value!.toBigInt();
-  }
-
-  set hardCap(value: BigInt) {
-    this.set("hardCap", Value.fromBigInt(value));
   }
 
   get start(): BigInt {
@@ -311,6 +248,51 @@ export class IRO extends Entity {
 
   set end(value: BigInt) {
     this.set("end", Value.fromBigInt(value));
+  }
+
+  get currency(): Bytes {
+    let value = this.get("currency");
+    return value!.toBytes();
+  }
+
+  set currency(value: Bytes) {
+    this.set("currency", Value.fromBytes(value));
+  }
+
+  get treasuryFee(): BigInt {
+    let value = this.get("treasuryFee");
+    return value!.toBigInt();
+  }
+
+  set treasuryFee(value: BigInt) {
+    this.set("treasuryFee", Value.fromBigInt(value));
+  }
+
+  get operationFee(): BigInt {
+    let value = this.get("operationFee");
+    return value!.toBigInt();
+  }
+
+  set operationFee(value: BigInt) {
+    this.set("operationFee", Value.fromBigInt(value));
+  }
+
+  get targetFunding(): BigInt {
+    let value = this.get("targetFunding");
+    return value!.toBigInt();
+  }
+
+  set targetFunding(value: BigInt) {
+    this.set("targetFunding", Value.fromBigInt(value));
+  }
+
+  get unitPrice(): BigInt {
+    let value = this.get("unitPrice");
+    return value!.toBigInt();
+  }
+
+  set unitPrice(value: BigInt) {
+    this.set("unitPrice", Value.fromBigInt(value));
   }
 
   get totalFunding(): BigInt {
@@ -346,15 +328,6 @@ export class IRO extends Entity {
 
   set fundsWithdrawn(value: boolean) {
     this.set("fundsWithdrawn", Value.fromBoolean(value));
-  }
-
-  get ownerClaimed(): boolean {
-    let value = this.get("ownerClaimed");
-    return value!.toBoolean();
-  }
-
-  set ownerClaimed(value: boolean) {
-    this.set("ownerClaimed", Value.fromBoolean(value));
   }
 
   get realEstateId(): BigInt | null {

@@ -26,20 +26,17 @@ type IRO @entity {
   iroId: BigInt!
   status: Status!
   listingOwner: Bytes!
-  unitPrice: BigInt!
-  listingOwnerShare: BigDecimal!
-  treasuryFee: BigDecimal!
-  reservesFee: BigDecimal!
-  currency: Bytes!
   currencyDecimals: BigInt!
-  softCap: BigInt!
-  hardCap: BigInt!
   start: BigInt!
   end: BigInt!
+  currency: Bytes!
+  treasuryFee: BigInt!
+  operationFee: BigInt!
+  targetFunding: BigInt!
+  unitPrice: BigInt!
   totalFunding: BigInt!
   shares: [UserShare!]
   fundsWithdrawn: Boolean!
-  ownerClaimed: Boolean!
   realEstateId: BigInt
 }
 
