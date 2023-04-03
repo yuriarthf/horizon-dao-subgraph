@@ -196,6 +196,15 @@ export class IRO extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
+  get iroContractAddress(): Bytes {
+    let value = this.get("iroContractAddress");
+    return value!.toBytes();
+  }
+
+  set iroContractAddress(value: Bytes) {
+    this.set("iroContractAddress", Value.fromBytes(value));
+  }
+
   get iroId(): BigInt {
     let value = this.get("iroId");
     return value!.toBigInt();

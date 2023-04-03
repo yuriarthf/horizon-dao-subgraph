@@ -1,6 +1,6 @@
 enum Status {
   PENDING
-  ONGOING
+  FUNDING
   SUCCESS
   FAIL
 }
@@ -23,6 +23,7 @@ type UserShare @entity {
 
 type IRO @entity {
   id: Bytes!
+  iroContractAddress: Bytes!
   iroId: BigInt!
   status: Status!
   listingOwner: Bytes!

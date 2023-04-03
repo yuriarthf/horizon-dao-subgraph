@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: InitialRealEstateOffering
-    network: mumbai
+    network: goerli
     source:
-      address: "0xce45EB481CD69281A601d289500420107F7e6fDA"
+      address: "0x8848C294295d8bbC49800207311e0954D88EA70a"
       abi: InitialRealEstateOffering
-      startBlock: 33512571
+      startBlock: 8760769
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -40,11 +40,11 @@ dataSources:
       file: ./src/initial-real-estate-offering.ts
   - kind: ethereum
     name: RealEstateNFT
-    network: mumbai
+    network: goerli
     source:
-      address: "0x8A108e17dF51A1795eC80E9aD14110481642EB97"
+      address: "0x454A4E2B081f370D0165745F758322b74a841023"
       abi: RealEstateNFT
-      startBlock: 33512315
+      startBlock: 8760760
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

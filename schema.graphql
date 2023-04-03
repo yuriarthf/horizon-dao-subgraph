@@ -23,6 +23,7 @@ type UserShare @entity {
 
 type IRO @entity {
   id: Bytes!
+  iroContractAddress: Bytes!
   iroId: BigInt!
   status: Status!
   listingOwner: Bytes!
