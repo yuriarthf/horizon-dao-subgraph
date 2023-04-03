@@ -1,4 +1,4 @@
-import { Bytes, BigDecimal, BigInt, ethereum, Address } from "@graphprotocol/graph-ts";
+import { Bytes, Address } from "@graphprotocol/graph-ts";
 
 import {
   TransferSingle as TransferSingleEvent,

@@ -1,6 +1,6 @@
 enum Status {
   PENDING
-  ONGOING
+  FUNDING
   SUCCESS
   FAIL
 }
